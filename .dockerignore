@@ -1,0 +1,47 @@
+
+**/bin/
+**/obj/
+
+# Git internals
+.git/
+.gitignore
+.gitattributes
+
+# IDE & OS noise
+.vs/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+
+# Secrets NEVER send to the Docker daemon
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.key
+*.pem
+
+tests/
+**/TestResults/
+**/coverage*/
+**/*.trx
+**/*.coverage
+
+# Documentation and repo metadata
+docs/
+README.md
+*.md
+LICENSE
+
+# Docker Compose files (not needed inside the image)
+docker-compose*.yml
+deploy/
+
+# Logs
+*.log
+logs/

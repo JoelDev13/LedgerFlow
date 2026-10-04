@@ -1,0 +1,68 @@
+services:
+
+  # PostgreSQL verify tag: https://hub.docker.com/_/postgres
+  db:
+    image: postgres:17.2
+    container_name: ledgerflow_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"  # 5432 taken by local Postgres; connect via port 5433
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis verify tag: https://hub.docker.com/_/redis
+  redis:
+    image: redis:7.4.1-alpine
+    container_name: ledgerflow_redis
+    restart: unless-stopped
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # API waits for db and redis to be healthy before starting
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ledgerflow/api:local
+    container_name: ledgerflow_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT:              ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
+      ConnectionStrings__Redis:            ${REDIS_CONNECTION_STRING}
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:8080/health/live" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  postgres_data:
+  redis_data:
