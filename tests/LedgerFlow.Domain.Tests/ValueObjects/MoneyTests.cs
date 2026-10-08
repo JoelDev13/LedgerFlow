@@ -16,9 +16,23 @@ public class MoneyTests
         Assert.False(money.IsPositive);
     }
 
+    // Verifies value equality between two Money instances with the same amount and currency
+    [Fact]
+    public void Equals_WhenSameAmountAndCurrency_ShouldReturnTrue()
+    {
+        var money1 = new Money(1050, Currency.Usd);
+        var money2 = new Money(1050, Currency.Usd);
+
+        Assert.Equal(money1, money2);
+        Assert.True(money1 == money2);
+        Assert.False(money1 != money2);
+    }
+
     // Verifies that FromDecimal converts decimal amounts to minor units using banker's rounding
     [Theory]
     [InlineData(10.50, 1050)]
+    [InlineData(10.005, 1000)] // Banker's rounding rounds 1000.5 to even (1000)
+    [InlineData(10.015, 1002)] // Banker's rounding rounds 1001.5 to even (1002)
     [InlineData(10.545, 1054)] // Banker's rounding rounds .545 to even (.54) -> 1054
     [InlineData(10.555, 1056)] // Banker's rounding rounds .555 to even (.56) -> 1056
     public void FromDecimal_ShouldConvertToMinorUnitsWithBankersRounding(decimal input, long expectedMinorUnits)
@@ -102,9 +116,9 @@ public class MoneyTests
         Assert.Equal("Money.CurrencyMismatch", result.Error.Code);
     }
 
-    // Verifies that Multiply correctly multiplies the amount by an integer factor
+    // Verifies that Multiply correctly multiplies the amount by an integer factor and preserves currency
     [Fact]
-    public void Multiply_ByIntegerFactor_ShouldReturnMultipliedMoney()
+    public void Multiply_ByIntegerFactor_ShouldReturnMultipliedMoneyAndPreserveCurrency()
     {
         var money = Money.FromDecimal(12.50m, Currency.Eur).Value;
 
@@ -112,6 +126,7 @@ public class MoneyTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(50.00m, result.Value.ToDecimal());
+        Assert.Equal(Currency.Eur, result.Value.Currency);
     }
 
     // Verifies that IsPositive returns true for positive amounts and false for zero or negative amounts
