@@ -50,17 +50,19 @@ public class OrganizationTests
         Assert.Contains(org.Members, m => m.UserId == newMemberId && m.Role == OrganizationRole.Accountant);
     }
 
-    // Verifies that non-owner members cannot add members to the organization
-    [Fact]
-    public void AddMember_WhenActorIsNotOwner_ShouldReturnFailure()
+    // Verifies that non-owner members (Accountant and Member) cannot add members
+    [Theory]
+    [InlineData(OrganizationRole.Accountant)]
+    [InlineData(OrganizationRole.Member)]
+    public void AddMember_WhenActorIsNotOwner_ShouldReturnFailure(OrganizationRole nonOwnerRole)
     {
         var ownerId = Guid.NewGuid();
-        var accountantId = Guid.NewGuid();
+        var nonOwnerId = Guid.NewGuid();
         var thirdUserId = Guid.NewGuid();
         var org = Organization.Create("Acme Corp", ownerId).Value;
-        org.AddMember(ownerId, accountantId, OrganizationRole.Accountant);
+        org.AddMember(ownerId, nonOwnerId, nonOwnerRole);
 
-        var result = org.AddMember(accountantId, thirdUserId, OrganizationRole.Member);
+        var result = org.AddMember(nonOwnerId, thirdUserId, OrganizationRole.Member);
 
         Assert.True(result.IsFailure);
         Assert.Equal("Organization.OnlyOwnerCanManageMembers", result.Error.Code);
@@ -97,18 +99,20 @@ public class OrganizationTests
         Assert.DoesNotContain(org.Members, m => m.UserId == memberId);
     }
 
-    // Verifies that non-owner members cannot remove members
-    [Fact]
-    public void RemoveMember_WhenActorIsNotOwner_ShouldReturnFailure()
+    // Verifies that non-owner members (Accountant and Member) cannot remove members
+    [Theory]
+    [InlineData(OrganizationRole.Accountant)]
+    [InlineData(OrganizationRole.Member)]
+    public void RemoveMember_WhenActorIsNotOwner_ShouldReturnFailure(OrganizationRole nonOwnerRole)
     {
         var ownerId = Guid.NewGuid();
-        var accountantId = Guid.NewGuid();
+        var nonOwnerId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
         var org = Organization.Create("Acme Corp", ownerId).Value;
-        org.AddMember(ownerId, accountantId, OrganizationRole.Accountant);
+        org.AddMember(ownerId, nonOwnerId, nonOwnerRole);
         org.AddMember(ownerId, memberId, OrganizationRole.Member);
 
-        var result = org.RemoveMember(accountantId, memberId);
+        var result = org.RemoveMember(nonOwnerId, memberId);
 
         Assert.True(result.IsFailure);
         Assert.Equal("Organization.OnlyOwnerCanManageMembers", result.Error.Code);
