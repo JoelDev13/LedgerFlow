@@ -111,4 +111,65 @@ public sealed class Invoice : AggregateRoot<Guid>
 
         return Result.Success();
     }
+
+    public Result Send()
+    {
+        if (Status != InvoiceStatus.Draft)
+        {
+            return Result.Failure(InvoiceErrors.InvalidStatusTransition);
+        }
+
+        if (_lines.Count == 0)
+        {
+            return Result.Failure(InvoiceErrors.EmptyLines);
+        }
+
+        Status = InvoiceStatus.Sent;
+        return Result.Success();
+    }
+
+    public Result Approve()
+    {
+        if (Status != InvoiceStatus.Sent)
+        {
+            return Result.Failure(InvoiceErrors.InvalidStatusTransition);
+        }
+
+        Status = InvoiceStatus.Approved;
+        return Result.Success();
+    }
+
+    public Result MarkAsPaid()
+    {
+        if (Status == InvoiceStatus.Paid)
+        {
+            return Result.Failure(InvoiceErrors.AlreadyPaid);
+        }
+
+        if (Status != InvoiceStatus.Approved)
+        {
+            return Result.Failure(InvoiceErrors.InvalidStatusTransition);
+        }
+
+        Status = InvoiceStatus.Paid;
+        AddDomainEvent(new Events.InvoicePaidDomainEvent(Id, OrganizationId, Total));
+        return Result.Success();
+    }
+
+    public Result Cancel()
+    {
+        if (Status == InvoiceStatus.Paid)
+        {
+            return Result.Failure(InvoiceErrors.CannotCancelPaid);
+        }
+
+        if (Status == InvoiceStatus.Cancelled)
+        {
+            return Result.Failure(InvoiceErrors.InvalidStatusTransition);
+        }
+
+        Status = InvoiceStatus.Cancelled;
+        AddDomainEvent(new Events.InvoiceCancelledDomainEvent(Id, OrganizationId));
+        return Result.Success();
+    }
 }

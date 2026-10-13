@@ -47,4 +47,12 @@ public static class InvoiceErrors
     public static readonly Error CurrencyMismatch = new(
         "Invoice.CurrencyMismatch",
         "Line price currency must match invoice currency");
+
+    public static readonly Error AlreadyPaid = new(
+        "Invoice.AlreadyPaid",
+        "The invoice is already paid");
+
+    public static readonly Error CannotCancelPaid = new(
+        "Invoice.CannotCancelPaid",
+        "A paid invoice cannot be cancelled");
 }

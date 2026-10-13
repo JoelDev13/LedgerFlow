@@ -1,6 +1,7 @@
 namespace LedgerFlow.Domain.Tests.Entities;
 
 using LedgerFlow.Domain.Entities;
+using LedgerFlow.Domain.Events;
 using LedgerFlow.Domain.ValueObjects;
 
 public class InvoiceTests
@@ -12,11 +13,8 @@ public class InvoiceTests
         var orgId = Guid.NewGuid();
         var invoice = Invoice.Create(orgId, "INV-001", "Acme Corp", Currency.Usd).Value;
 
-        //2 x $50.00 = $100.00
         invoice.AddLine("Consulting", 2, Money.FromDecimal(50.00m, Currency.Usd).Value);
-        //1 x $150.00 = $150.00
         invoice.AddLine("Hosting", 1, Money.FromDecimal(150.00m, Currency.Usd).Value);
-        //5 x $10.00 = $50.00
         invoice.AddLine("Domain licenses", 5, Money.FromDecimal(10.00m, Currency.Usd).Value);
 
         Assert.Equal(3, invoice.Lines.Count);
@@ -94,5 +92,114 @@ public class InvoiceTests
 
         Assert.True(result.IsFailure);
         Assert.Equal("Invoice.DescriptionRequired", result.Error.Code);
+    }
+
+    // Verifies that sending an invoice without lines returns EmptyLines error
+    [Fact]
+    public void Send_WhenInvoiceHasNoLines_ShouldReturnFailure()
+    {
+        var orgId = Guid.NewGuid();
+        var invoice = Invoice.Create(orgId, "INV-006", "Oscorp", Currency.Usd).Value;
+
+        var result = invoice.Send();
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Invoice.EmptyLines", result.Error.Code);
+    }
+
+    // Verifies the complete happy path transitions from Draft to Paid and records InvoicePaidDomainEvent
+    [Fact]
+    public void Lifecycle_WhenProgressingFromDraftToPaid_ShouldTransitionAndEmitDomainEvent()
+    {
+        var orgId = Guid.NewGuid();
+        var invoice = Invoice.Create(orgId, "INV-007", "Stark Corp", Currency.Usd).Value;
+        invoice.AddLine("Armor Maintenance", 1, Money.FromDecimal(1000.00m, Currency.Usd).Value);
+
+        var sendResult = invoice.Send();
+        Assert.True(sendResult.IsSuccess);
+        Assert.Equal(InvoiceStatus.Sent, invoice.Status);
+
+        var approveResult = invoice.Approve();
+        Assert.True(approveResult.IsSuccess);
+        Assert.Equal(InvoiceStatus.Approved, invoice.Status);
+
+        var payResult = invoice.MarkAsPaid();
+        Assert.True(payResult.IsSuccess);
+        Assert.Equal(InvoiceStatus.Paid, invoice.Status);
+
+        Assert.Single(invoice.DomainEvents);
+        var paidEvent = Assert.IsType<InvoicePaidDomainEvent>(invoice.DomainEvents.First());
+        Assert.Equal(invoice.Id, paidEvent.InvoiceId);
+        Assert.Equal(orgId, paidEvent.OrganizationId);
+        Assert.Equal(invoice.Total, paidEvent.Amount);
+    }
+
+    // Verifies that marking an already paid invoice as paid returns AlreadyPaid error
+    [Fact]
+    public void MarkAsPaid_WhenAlreadyPaid_ShouldReturnFailure()
+    {
+        var orgId = Guid.NewGuid();
+        var invoice = Invoice.Create(orgId, "INV-008", "Wayne Tech", Currency.Usd).Value;
+        invoice.AddLine("Equipment", 1, Money.FromDecimal(500.00m, Currency.Usd).Value);
+        invoice.Send();
+        invoice.Approve();
+        invoice.MarkAsPaid();
+
+        var result = invoice.MarkAsPaid();
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Invoice.AlreadyPaid", result.Error.Code);
+    }
+
+    // Verifies that a paid invoice cannot be cancelled and returns CannotCancelPaid error
+    [Fact]
+    public void Cancel_WhenInvoiceIsAlreadyPaid_ShouldReturnFailure()
+    {
+        var orgId = Guid.NewGuid();
+        var invoice = Invoice.Create(orgId, "INV-009", "LexCorp", Currency.Usd).Value;
+        invoice.AddLine("Software", 1, Money.FromDecimal(250.00m, Currency.Usd).Value);
+        invoice.Send();
+        invoice.Approve();
+        invoice.MarkAsPaid();
+
+        var result = invoice.Cancel();
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Invoice.CannotCancelPaid", result.Error.Code);
+    }
+
+    // Verifies that cancelling an approved invoice succeeds and emits InvoiceCancelledDomainEvent
+    [Fact]
+    public void Cancel_WhenInvoiceIsApproved_ShouldSucceedAndEmitDomainEvent()
+    {
+        var orgId = Guid.NewGuid();
+        var invoice = Invoice.Create(orgId, "INV-010", "Daily Planet", Currency.Usd).Value;
+        invoice.AddLine("Newsprint", 1, Money.FromDecimal(100.00m, Currency.Usd).Value);
+        invoice.Send();
+        invoice.Approve();
+
+        var result = invoice.Cancel();
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(InvoiceStatus.Cancelled, invoice.Status);
+        Assert.Single(invoice.DomainEvents);
+        var cancelledEvent = Assert.IsType<InvoiceCancelledDomainEvent>(invoice.DomainEvents.First());
+        Assert.Equal(invoice.Id, cancelledEvent.InvoiceId);
+        Assert.Equal(orgId, cancelledEvent.OrganizationId);
+    }
+
+    // Verifies that adding lines to an invoice after it has been sent returns NotEditable error
+    [Fact]
+    public void AddLine_WhenInvoiceIsNotInDraft_ShouldReturnFailure()
+    {
+        var orgId = Guid.NewGuid();
+        var invoice = Invoice.Create(orgId, "INV-011", "Umbrella Corp", Currency.Usd).Value;
+        invoice.AddLine("Lab supplies", 1, Money.FromDecimal(200.00m, Currency.Usd).Value);
+        invoice.Send();
+
+        var result = invoice.AddLine("Extra test tubes", 2, Money.FromDecimal(50.00m, Currency.Usd).Value);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Invoice.NotEditable", result.Error.Code);
     }
 }
