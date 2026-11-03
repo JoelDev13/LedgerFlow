@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.ValueObjects;
-
 using LedgerFlow.Domain.Common;
+
+namespace LedgerFlow.Domain.ValueObjects;
 
 public sealed record Currency
 {

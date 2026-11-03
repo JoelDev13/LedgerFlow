@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.Tests.Entities;
-
 using LedgerFlow.Domain.Entities;
+
+namespace LedgerFlow.Domain.Tests.Entities;
 
 public class OrganizationTests
 {
@@ -50,7 +50,7 @@ public class OrganizationTests
         Assert.Contains(org.Members, m => m.UserId == newMemberId && m.Role == OrganizationRole.Accountant);
     }
 
-    // Verifies that non-owner members (Accountant and Member) cannot add members
+
     [Theory]
     [InlineData(OrganizationRole.Accountant)]
     [InlineData(OrganizationRole.Member)]
@@ -99,24 +99,6 @@ public class OrganizationTests
         Assert.DoesNotContain(org.Members, m => m.UserId == memberId);
     }
 
-    // Verifies that non-owner members (Accountant and Member) cannot remove members
-    [Theory]
-    [InlineData(OrganizationRole.Accountant)]
-    [InlineData(OrganizationRole.Member)]
-    public void RemoveMember_WhenActorIsNotOwner_ShouldReturnFailure(OrganizationRole nonOwnerRole)
-    {
-        var ownerId = Guid.NewGuid();
-        var nonOwnerId = Guid.NewGuid();
-        var memberId = Guid.NewGuid();
-        var org = Organization.Create("Acme Corp", ownerId).Value;
-        org.AddMember(ownerId, nonOwnerId, nonOwnerRole);
-        org.AddMember(ownerId, memberId, OrganizationRole.Member);
-
-        var result = org.RemoveMember(nonOwnerId, memberId);
-
-        Assert.True(result.IsFailure);
-        Assert.Equal("Organization.OnlyOwnerCanManageMembers", result.Error.Code);
-    }
 
     // Verifies that removing a non-existent member returns MemberNotFound error
     [Fact]

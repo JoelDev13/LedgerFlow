@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.Tests.ValueObjects;
-
 using LedgerFlow.Domain.ValueObjects;
+
+namespace LedgerFlow.Domain.Tests.ValueObjects;
 
 public class CurrencyTests
 {

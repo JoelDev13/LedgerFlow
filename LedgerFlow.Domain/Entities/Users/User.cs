@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.Entities;
-
 using LedgerFlow.Domain.Common;
+
+namespace LedgerFlow.Domain.Entities.Users;
 
 public sealed class User : AggregateRoot<Guid>
 {
@@ -63,4 +63,3 @@ public sealed class User : AggregateRoot<Guid>
             lastName.Trim()));
     }
 }
-

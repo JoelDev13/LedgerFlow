@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.Entities;
-
 using LedgerFlow.Domain.Common;
+
+namespace LedgerFlow.Domain.Entities;
 
 public static class JournalEntryErrors
 {

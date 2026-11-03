@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.Entities;
-
 using LedgerFlow.Domain.Common;
+
+namespace LedgerFlow.Domain.Entities.Users;
 
 public static class UserErrors
 {
@@ -36,4 +36,3 @@ public static class UserErrors
         "User.InvalidCredentials",
         "Email or password is incorrect");
 }
-

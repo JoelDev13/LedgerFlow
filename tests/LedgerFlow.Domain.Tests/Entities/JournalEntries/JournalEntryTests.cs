@@ -1,7 +1,7 @@
-namespace LedgerFlow.Domain.Tests.Entities;
-
 using LedgerFlow.Domain.Entities;
 using LedgerFlow.Domain.ValueObjects;
+
+namespace LedgerFlow.Domain.Tests.Entities;
 
 public class JournalEntryTests
 {

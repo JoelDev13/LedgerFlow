@@ -1,6 +1,6 @@
-namespace LedgerFlow.Domain.ValueObjects;
-
 using LedgerFlow.Domain.Common;
+
+namespace LedgerFlow.Domain.ValueObjects;
 
 // Money allows negative amounts for reversals and accounting adjustments
 public sealed record Money

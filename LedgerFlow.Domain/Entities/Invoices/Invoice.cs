@@ -1,7 +1,7 @@
-namespace LedgerFlow.Domain.Entities;
-
 using LedgerFlow.Domain.Common;
 using LedgerFlow.Domain.ValueObjects;
+
+namespace LedgerFlow.Domain.Entities;
 
 public sealed class Invoice : AggregateRoot<Guid>
 {
