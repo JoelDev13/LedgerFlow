@@ -2,13 +2,12 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy project files first so restore layer is cached
-COPY LedgerFlow.sln ./
 COPY LedgerFlow.Domain/LedgerFlow.Domain.csproj             LedgerFlow.Domain/
 COPY LedgerFlow.Application/LedgerFlow.Application.csproj   LedgerFlow.Application/
 COPY LedgerFlow.Infrastructure/LedgerFlow.Infrastructure.csproj LedgerFlow.Infrastructure/
 COPY LedgerFlow.Api/LedgerFlow.Api.csproj                   LedgerFlow.Api/
 
-RUN dotnet restore LedgerFlow.sln
+RUN dotnet restore LedgerFlow.Api/LedgerFlow.Api.csproj
 
 # Copy source and publish
 COPY LedgerFlow.Domain/         LedgerFlow.Domain/
