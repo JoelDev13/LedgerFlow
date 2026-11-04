@@ -11,4 +11,8 @@
         <ProjectReference Include="..\LedgerFlow.Infrastructure\LedgerFlow.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
+    </ItemGroup>
+
 </Project>
