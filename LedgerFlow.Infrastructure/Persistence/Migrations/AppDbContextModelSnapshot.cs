@@ -22,7 +22,50 @@ namespace LedgerFlow.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("LedgerFlow.Domain.Entities.User", b =>
+            modelBuilder.Entity("LedgerFlow.Domain.Entities.Organizations.Organization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedNever()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("organizations", (string)null);
+                });
+
+            modelBuilder.Entity("LedgerFlow.Domain.Entities.Organizations.OrganizationMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedNever()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("OrganizationId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("organization_members", (string)null);
+                });
+
+            modelBuilder.Entity("LedgerFlow.Domain.Entities.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedNever()
@@ -57,8 +100,27 @@ namespace LedgerFlow.Infrastructure.Persistence.Migrations
 
                     b.ToTable("users", (string)null);
                 });
+
+            modelBuilder.Entity("LedgerFlow.Domain.Entities.Organizations.OrganizationMember", b =>
+                {
+                    b.HasOne("LedgerFlow.Domain.Entities.Organizations.Organization", null)
+                        .WithMany("Members")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LedgerFlow.Domain.Entities.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LedgerFlow.Domain.Entities.Organizations.Organization", b =>
+                {
+                    b.Navigation("Members");
+                });
 #pragma warning restore 612, 618
         }
     }
 }
-

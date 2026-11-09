@@ -2,7 +2,7 @@ using LedgerFlow.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace LedgerFlow.Infrastructure.Persistence.Configurations;
+namespace LedgerFlow.Infrastructure.Persistence.Configurations.Users;
 
 public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {

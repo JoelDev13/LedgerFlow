@@ -1,4 +1,4 @@
-using LedgerFlow.Domain.Entities;
+using LedgerFlow.Domain.Entities.Organizations;
 
 namespace LedgerFlow.Domain.Tests.Entities;
 

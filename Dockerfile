@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.203 AS build
 WORKDIR /src
 
 # Copy project files first so restore layer is cached
@@ -21,7 +21,7 @@ RUN dotnet publish LedgerFlow.Api/LedgerFlow.Api.csproj \
     --output /app/publish \
     -p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0.7 AS runtime
 WORKDIR /app
 
 # curl needed for HEALTHCHECK

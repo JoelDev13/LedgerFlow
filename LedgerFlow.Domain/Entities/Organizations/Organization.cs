@@ -1,6 +1,6 @@
 using LedgerFlow.Domain.Common;
 
-namespace LedgerFlow.Domain.Entities;
+namespace LedgerFlow.Domain.Entities.Organizations;
 
 public sealed class Organization : AggregateRoot<Guid>
 {
