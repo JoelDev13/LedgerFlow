@@ -1,5 +1,5 @@
 using LedgerFlow.Application.Interfaces.Authentication;
-using LedgerFlow.Application.Interfaces.Repositories;
+using LedgerFlow.Domain.Repositories;
 using LedgerFlow.Infrastructure.Authentication;
 using LedgerFlow.Infrastructure.Persistence;
 using LedgerFlow.Infrastructure.Persistence.Repositories;
@@ -26,6 +26,7 @@ public static class ServiceRegistration
         });
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IOrganizationRepository, OrganizationRepository>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

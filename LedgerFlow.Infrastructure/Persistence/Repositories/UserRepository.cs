@@ -1,4 +1,4 @@
-using LedgerFlow.Application.Interfaces.Repositories;
+using LedgerFlow.Domain.Repositories;
 using LedgerFlow.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 

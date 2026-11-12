@@ -1,5 +1,5 @@
 using LedgerFlow.Application.Interfaces.Authentication;
-using LedgerFlow.Application.Interfaces.Repositories;
+using LedgerFlow.Domain.Repositories;
 using LedgerFlow.Domain.Common;
 using LedgerFlow.Domain.Entities.Users;
 using MediatR;

@@ -1,6 +1,6 @@
 using LedgerFlow.Domain.Entities.Users;
 
-namespace LedgerFlow.Application.Interfaces.Repositories;
+namespace LedgerFlow.Domain.Repositories;
 
 public interface IUserRepository
 {
@@ -9,3 +9,4 @@ public interface IUserRepository
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task AddAsync(User user, CancellationToken cancellationToken = default);
 }
+
