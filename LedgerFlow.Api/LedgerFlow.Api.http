@@ -33,6 +33,64 @@ Content-Type: application/json
 ### Token captured from login response
 @authToken = {{login.response.body.token}}
 
-
+### 4 Authenticated Health Check
 GET {{baseUrl}}/health/live
 Authorization: Bearer {{authToken}}
+
+###
+
+### 5 Create Organization
+# @name createOrganization
+POST {{baseUrl}}/api/organizations
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "LedgerFlow Inc"
+}
+
+### Captured Organization ID
+@organizationId = {{createOrganization.response.body.id}}
+
+###
+
+### 6 List User Organizations
+GET {{baseUrl}}/api/organizations
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### 7 Get Organization by ID
+GET {{baseUrl}}/api/organizations/{{organizationId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### 8 Register Second User (New Member)
+# @name registerMember
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "member.joel@example.com",
+  "password": "StrongPassword123!",
+  "firstName": "Member",
+  "lastName": "Joel"
+}
+
+### Captured Member User ID
+@newMemberUserId = {{registerMember.response.body.id}}
+
+###
+
+### 9 Add Member to Organization
+POST {{baseUrl}}/api/organizations/{{organizationId}}/members
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "newUserId": "{{newMemberUserId}}",
+  "role": "Member"
+}

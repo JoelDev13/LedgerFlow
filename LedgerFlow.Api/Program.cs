@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using LedgerFlow.Application;
 using LedgerFlow.Infrastructure;
 using LedgerFlow.Infrastructure.Persistence;
@@ -38,7 +39,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 var app = builder.Build();
 
