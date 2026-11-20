@@ -1,3 +1,4 @@
+using LedgerFlow.Domain.Entities.Accounts;
 using LedgerFlow.Domain.Entities.Organizations;
 using LedgerFlow.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<OrganizationMember> OrganizationMembers => Set<OrganizationMember>();
+    public DbSet<Account> Accounts => Set<Account>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

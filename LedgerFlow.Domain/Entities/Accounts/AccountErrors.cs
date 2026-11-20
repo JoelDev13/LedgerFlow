@@ -1,6 +1,6 @@
 using LedgerFlow.Domain.Common;
 
-namespace LedgerFlow.Domain.Entities;
+namespace LedgerFlow.Domain.Entities.Accounts;
 
 public static class AccountErrors
 {
@@ -15,4 +15,12 @@ public static class AccountErrors
     public static readonly Error InvalidOrganizationId = new(
         "Account.InvalidOrganizationId",
         "Organization ID is invalid");
+
+    public static readonly Error DuplicateCode = new(
+        "Account.DuplicateCode",
+        "An account with this code already exists in the organization");
+
+    public static readonly Error AccountNotFound = new(
+        "Account.NotFound",
+        "The requested account was not found");
 }

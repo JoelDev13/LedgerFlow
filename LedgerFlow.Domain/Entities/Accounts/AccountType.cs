@@ -1,4 +1,4 @@
-namespace LedgerFlow.Domain.Entities;
+namespace LedgerFlow.Domain.Entities.Accounts;
 
 public enum AccountType
 {
